@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Depends
+from fastapi.exceptions import RequestValidationError
 
 from apis import router_list
 from common.auth import check_permission
-from common.middleware import handle_exception_middleware
+from common.middleware import handle_exception_middleware, handler_validation_exception
 
 
 def create_app() -> FastAPI:
@@ -19,4 +20,5 @@ def create_app() -> FastAPI:
     
     # 添加自定义中间件
     app.middleware('http')(handle_exception_middleware)
+    app.exception_handler(RequestValidationError)(handler_validation_exception)
     return app

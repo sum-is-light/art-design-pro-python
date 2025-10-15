@@ -1,5 +1,6 @@
 import time
 from fastapi import Request, HTTPException
+from fastapi.exceptions import RequestValidationError
 from starlette.responses import Response, JSONResponse
 
 from common.log import logger
@@ -37,3 +38,12 @@ async def handle_exception_middleware(request: Request, call_next):
         end_tm = time.time_ns()
     logger.info(f'{client_info} - {request.method.upper()} {request.url.path}?{request.query_params} {request.url.scheme.upper()} status code:{resp.status_code}, processing time:{(end_tm - start_tm) // 1e6:.0f}ms')
     return resp
+
+
+async def handler_validation_exception(request: Request, exc: RequestValidationError):
+    ''' 处理参数验证失败的异常 '''
+    logger.error(exc)   # 显示日志
+    return JSONResponse(
+        status_code=200,
+        content=CommonResponse.fail(501, str(exc)).model_dump()
+    )
