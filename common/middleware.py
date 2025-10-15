@@ -27,7 +27,7 @@ async def handle_exception_middleware(request: Request, call_next):
     except ApiException as e:
         logger.error(e)
         resp = JSONResponse(
-            status_code=200, content=CommonResponse.fail(500, f'接口异常,请联系管理员!\ndetail: {e}').model_dump()
+            status_code=200, content=CommonResponse.fail(500, f'{e}').model_dump()
         )
     except Exception as e:
         logger.exception(e)

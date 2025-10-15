@@ -34,10 +34,12 @@ class MenuEnum(PermissionEnum):
 class InterfaceEnum(PermissionEnum):
     ''' 接口权限枚举 '''
     USER_GET = PermissionEnumValue(name='用户信息获取', code='/users/get')
+    USER_POST = PermissionEnumValue(name='用户创建获取', code='/users/post')
 
 
 class ButtionEnum(PermissionEnum):
     ''' 按钮权限枚举 '''
+    USER_ADD = PermissionEnumValue(name='用户新增', code='user:add')
     USER_EDIT = PermissionEnumValue(name='用户编辑', code='user:edit')
 
 

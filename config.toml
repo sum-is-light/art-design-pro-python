@@ -8,3 +8,11 @@ workers = 1
 level = 'DEBUG'
 format = '[%(levelname)s] - %(asctime)s %(module)s:%(funcName)s:%(lineno)d - %(message)s'
 file = 'log.txt'
+
+[db]
+# 数据库连接 URL（异步驱动格式）
+# PostgreSQL: "postgresql+asyncpg://user:password@localhost:5432/dbname"
+# MySQL: "mysql+aiomysql://user:password@localhost:3306/dbname"
+# SQLite: "sqlite+aiosqlite:///./test.db"（注意：SQLite 异步需用 aiosqlite）
+url = 'sqlite+aiosqlite:///./test.db'
+echo = true
