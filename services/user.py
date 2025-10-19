@@ -1,13 +1,16 @@
+from typing import Sequence
 from sqlalchemy.future import select
 
 from db import AsyncSession
 from models.user import UserModel
-from schemas.user import UserSchema, UserCreateSchema
 from common.exception import ApiException
 from common.response import CommonResponse
+from common.pagination import PaginationQuerySchema, PaginationSchema, pagination
+from schemas.user import UserSchema, UserCreateSchema
 
-def get_list() -> list:
-    return []
+
+async def pagelist(schema: PaginationQuerySchema, session: AsyncSession) -> tuple[PaginationSchema, Sequence[UserModel]]:
+    return await pagination(UserModel, schema, session)
 
 async def create_user(data: UserCreateSchema, session: AsyncSession) -> CommonResponse:
     # 校验该用户名是否已存在
