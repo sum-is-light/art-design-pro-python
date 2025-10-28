@@ -68,6 +68,9 @@ def parse_token(jwt_token: str, secret_key: str, algorithm: str) -> dict:
             raise PermissionException('失效的令牌')
         decode_dict.pop('exp')
         return decode_dict
+    except jwt.ExpiredSignatureError as e:
+        logger.exception(e)
+        raise PermissionException('登录过期，请重新登录')
     except Exception as e:
         logger.exception(e)
         raise PermissionException('非法的令牌')

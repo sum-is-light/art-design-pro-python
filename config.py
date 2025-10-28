@@ -30,9 +30,17 @@ class AuthJWTConfig(BaseModel):
     expire_minute: int = Field(description='过期时间')
 
 
+class AuthManageConfig(BaseModel):
+    ''' 权限管理配置 '''
+    super_admin_name: str = Field(description='超级管理员名称')
+    super_admin_code: str = Field(description='超级管理员编码')
+    super_admin_desc: str = Field(description='超级管理员描述')
+
+
 class AuthConfig(BaseModel):
     ''' 权限配置 '''
     jwt: AuthJWTConfig = Field(description='jwt配置')
+    manage: AuthManageConfig = Field(description='权限管理配置')
 
 
 class Config(BaseModel):

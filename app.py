@@ -8,6 +8,8 @@ from common.log import logger
 from common.depends import check_permission
 from common.middleware import handle_exception_middleware, handler_validation_exception
 
+from scripts.data_manage import insert_permission, build_superadmin_role
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,6 +17,8 @@ async def lifespan(app: FastAPI):
     async with async_engine.begin() as connect:
         logger.info(f'init tables, {DBBaseModel.metadata}')
         await connect.run_sync(DBBaseModel.metadata.create_all)
+    await insert_permission()
+    await build_superadmin_role()
     yield
     # app启动后执行的操作
 

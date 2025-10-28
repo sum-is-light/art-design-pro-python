@@ -4,6 +4,8 @@ from fastapi import APIRouter
 from pydantic import BaseModel, ConfigDict
 
 from .user import router as user_router
+from .role import router as role_router
+from .permission import router as permission_router
 
 
 class RouteInfo(BaseModel):
@@ -17,6 +19,8 @@ class RouteInfo(BaseModel):
 
 router_list: list[RouteInfo] = [
     RouteInfo(prefix='/users', router=user_router, tags=['user']),
+    RouteInfo(prefix='/roles', router=role_router, tags=['role']),
+    RouteInfo(prefix='/permissions', router=permission_router, tags=['permission']),
 ]
 
 __all__ = ['router_list']

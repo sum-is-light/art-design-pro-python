@@ -22,3 +22,8 @@ echo = true
 secret_key = 'fajsdfaldhaj#7493'
 expire_minute = 720
 algorithm = 'HS256'
+
+[auth.manage]
+super_admin_code = 'SuperAdmin'
+super_admin_name = '超级管理员'
+super_admin_desc = '拥有系统的最高权限，所有功能都可以访问'

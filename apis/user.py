@@ -10,7 +10,11 @@ from common.auth import RoutePermission, generate_token
 from common.depends import get_query_params, check_permission
 from common.permission_enum import MenuEnum, InterfaceEnum, ButtionEnum
 
-from schemas.user import UserCreateSchema, UserSchema, UserLoginSchema, UserUpdateSchema, UserChangeStatusSchema
+from schemas.role import RoleSchema
+from schemas.user import (
+    UserCreateSchema, UserSchema, UserLoginSchema, UserUpdateSchema,
+    UserChangeStatusSchema, UserDispatchRoleSchema
+)
 
 
 router = APIRouter()
@@ -24,6 +28,17 @@ router = APIRouter()
 async def change_status(uid: int, data: UserChangeStatusSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'userId: {uid}, status: {data.enable}')
     await UserService.change_status(uid, data.enable, session)
+    return CommonResponse.success(data=True)
+
+
+@router.post('/dispatch/{uid}', openapi_extra=RoutePermission(
+        menu_list=[MenuEnum.USER_MANAGE],
+        interface_list=[InterfaceEnum.USER_ENABLE],
+        buttion_list=[ButtionEnum.USER_EDIT]
+).to_openapi_extra())
+async def user_dispatch_role(uid: int, data: UserDispatchRoleSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
+    logger.info(f'userId: {uid}, data: {data.model_dump()}')
+    await UserService.user_dispatch_role(uid, data.rid, session)
     return CommonResponse.success(data=True)
 
 
@@ -72,6 +87,8 @@ async def info(user: UserService.UserModel = Depends(check_permission), session:
     ''' 获取用户信息接口 '''
     user_dict = UserSchema.model_validate(user).model_dump()
     user_dict['roles'] = ['R_SUPER']
+    user_dict['role'] = RoleSchema.model_validate(user.role).model_dump()
+    user_dict['rid'] = user.role.id
     return CommonResponse.success(data=user_dict)
 
 
@@ -84,6 +101,17 @@ async def pagelist(data: PaginationQuerySchema = Depends(get_query_params), sess
         'records': [UserSchema.model_validate(obj).model_dump() for obj in obj_list],
         **pagination.model_dump()
     })
+
+
+@router.get('/{uid}', openapi_extra=RoutePermission(
+        interface_list=[InterfaceEnum.USER_GET]
+).to_openapi_extra())
+async def get_info_by_id(uid: int, session: AsyncSession = Depends(async_session)):
+    ''' 获取用户信息接口 '''
+    user = await UserService.get_obj_by_query({'id': uid}, session)
+    user_dict = UserSchema.model_validate(user).model_dump()
+    user_dict['role'] = RoleSchema.model_validate(user.role).model_dump() if user.role else {}
+    return CommonResponse.success(data=user_dict)
 
 
 @router.post('/', openapi_extra=RoutePermission(

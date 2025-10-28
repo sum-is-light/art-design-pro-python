@@ -77,7 +77,7 @@ async def async_session():
         yield session
 
 
-async def async_session_wrapper(func):
+def async_session_wrapper(func):
     ''' 获取异步session的装饰器 '''
     async def wrapper(*args, **kwargs):
         async with AsyncSessionLocal() as session:  # type: ignore[arg-type]

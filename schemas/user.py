@@ -25,6 +25,10 @@ class UserChangeStatusSchema(BaseModel):
     enable: bool = Field(description='是否启用')
 
 
+class UserDispatchRoleSchema(BaseModel):
+    rid: int = Field(description='角色ID')
+
+
 class UserUpdateSchema(BaseModel):
     name: Optional[str] = Field(default=None, description='用户名')
     nickname: Optional[str] = Field(default=None, description='昵称')

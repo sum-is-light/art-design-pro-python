@@ -6,10 +6,13 @@ from models.user import UserModel
 from models.role import RoleModel
 from models.permission import PermissionModel
 from models.role_permission import RolePermissionModel
+
 from common.exception import ApiException
 from common.utils import get_db_model_fields
-from schemas.user import UserCreateSchema, UserUpdateSchema
 from common.pagination import PaginationQuerySchema, PaginationSchema, pagination
+
+import services.role as RoleService
+from schemas.user import UserCreateSchema, UserUpdateSchema
 
 
 async def delete_by_id(id: int, session: AsyncSession):
@@ -52,9 +55,6 @@ async def update_by_id(id: int, data: UserUpdateSchema, session: AsyncSession) -
     return obj
 
 
-async def pagelist(schema: PaginationQuerySchema, session: AsyncSession) -> tuple[PaginationSchema, Sequence[UserModel]]:
-    return await pagination(UserModel, schema, session)
-
 async def check_name(id: int, name: Optional[str], session: AsyncSession) -> bool:
     if not name:
         return True
@@ -88,3 +88,22 @@ async def create_user(data: UserCreateSchema, session: AsyncSession) -> UserMode
     await session.commit()
     await session.refresh(user)
     return user
+
+
+async def user_dispatch_role(id: int, role_id: int, session: AsyncSession) -> UserModel:
+    user = await get_obj_by_query({'id': id}, session)
+    if user is None:
+        raise ApiException('该用户不存在！')
+    
+    role = await RoleService.get_obj_by_query({'id': role_id, 'enable': True}, session)
+    if role is None:
+        raise ApiException('角色不存在')
+
+    user.role = role
+    await session.commit()
+    await session.refresh(user)
+    return user
+
+
+async def pagelist(schema: PaginationQuerySchema, session: AsyncSession) -> tuple[PaginationSchema, Sequence[UserModel]]:
+    return await pagination(UserModel, schema, session)

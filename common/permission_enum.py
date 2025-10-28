@@ -20,7 +20,7 @@ class PermissionEnum(Enum):
     ''' 权限枚举 '''
 
     @classmethod
-    def all(cls) -> list[str]:
+    def all(cls) -> list[PermissionEnumValue]:
         return [permission.value for permission in cls.__members__.values()]
 
 
@@ -45,5 +45,13 @@ class ButtionEnum(PermissionEnum):
     USER_ADD = PermissionEnumValue(name='用户新增', code='user:add')
     USER_EDIT = PermissionEnumValue(name='用户编辑', code='user:edit')
     USER_DEL = PermissionEnumValue(name='用户删除', code='user:del')
+
+    ROLE_ADD = PermissionEnumValue(name='权限新增', code='role:add')
+    ROLE_EDIT = PermissionEnumValue(name='权限编辑', code='role:edit')
+    ROLE_DEL = PermissionEnumValue(name='权限删除', code='role:del')
+
+    PERMISSION_ADD = PermissionEnumValue(name='权限新增', code='role:add')
+    PERMISSION_EDIT = PermissionEnumValue(name='权限编辑', code='role:edit')
+    PERMISSION_DEL = PermissionEnumValue(name='权限删除', code='role:del')
 
 # print(MenuEnum.all())
