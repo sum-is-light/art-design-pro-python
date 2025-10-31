@@ -22,3 +22,15 @@ class PermissionModel(DBBaseModel):
         back_populates='permissions',
         lazy='selectin'
     )
+
+    @classmethod
+    def group_permission(cls, permissions: list['PermissionModel']) -> dict[str, list['PermissionModel']]:
+        permission_dict = {'menu': [], 'interface': [], 'button': []}
+        for obj in permissions:
+            if getattr(obj, 'type') == PermissionEnum.MENU:
+                permission_dict['menu'].append(obj)
+            elif getattr(obj, 'type') == PermissionEnum.INTERFACE:
+                permission_dict['interface'].append(obj)
+            elif getattr(obj, 'type') == PermissionEnum.BUTTON:
+                permission_dict['button'].append(obj)
+        return permission_dict

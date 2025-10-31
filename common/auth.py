@@ -4,7 +4,10 @@ from datetime import datetime, timedelta, timezone
 
 from common.log import logger
 from common.exception import PermissionException
-from common.permission_enum import MenuEnum, InterfaceEnum, ButtionEnum
+from common.permission_enum import MenuEnum, InterfaceEnum, ButtionEnum, PermissionEnum
+
+from models.role import RoleModel
+from models.permission import PermissionModel
 
 
 class RoutePermission(BaseModel):
@@ -24,27 +27,59 @@ class RoutePermission(BaseModel):
         ''' 是否需要权限验证，如果三种权限都为空那么就不需要权限认证 '''
         return any([len(self.menu_list), len(self.interface_list), len(self.buttion_list)])
     
-    def check_menu(self, code: str) -> bool:
-        ''' 检查菜单权限 '''
-        # 如果对应权限列表为空,表示对该权限不做限制,直接返回
-        if not self.menu_list:
+    @classmethod
+    def check_items_permission(cls, require_codes: list[str], allow_codes: list[str]) -> bool:
+        ''' 两个item对应的权限是否有交集 '''
+        # 如果没有定义对应的item，表示不需要权限，直接通过校验
+        if not require_codes:
             return True
-        return code in [item.value.code for item in self.menu_list]
+        print(require_codes, allow_codes, '++++++++++++++++')
+        intersection = list(set(require_codes) & set(allow_codes))
+        return len(intersection) != 0
     
-    def chek_interface(self, code: str) -> bool:
-        ''' 检查接口权限 '''
-        # 如果对应权限列表为空,表示对该权限不做限制,直接返回
-        if not self.interface_list:
+    @classmethod
+    def get_codes(cls, require_items: list[PermissionEnum], allow_items: list[PermissionModel]) -> bool:
+        ''' 两个item对应的权限是否有交集 '''
+        # 如果没有定义对应的item，表示不需要权限，直接通过校验
+        if not require_items:
             return True
-        return code in [item.value.code for item in self.interface_list]
+        require_codes = [PermissionEnum.get_code(item) for item in require_items]
+        allow_codes = [item.code for item in allow_items]
+        print(require_codes, allow_codes, '++++++++++++++++')
+        intersection = list(set(require_codes) & set(allow_codes))
+        return len(intersection) != 0
     
-    def chek_button(self, code: str) -> bool:
-        ''' 检查按钮权限 '''
-        # 如果对应权限列表为空,表示对该权限不做限制,直接返回
-        if not self.buttion_list:
+    def check_permission(self, role: RoleModel) -> bool:
+        ''' 权限校验逻辑 '''
+        # 分别判定route定义的要求在角色的权限中是否存在
+        allow_dict = PermissionModel.group_permission(role.permissions)
+        require_dict = {'menu': self.menu_list, 'interface': self.interface_list, 'button': self.buttion_list}
+        # 如果路由三个权限都不需要，直接通过
+        if all([len(permission_list) == 0 for permission_list in require_dict.values()]):
             return True
-        return code in [item.value.code for item in self.buttion_list]
+        # 如果按钮权限不为空，判定有没有按钮权限
+        if self.buttion_list and self.check_items_permission(
+            PermissionEnum.get_codes(self.buttion_list), 
+            [getattr(item, 'code') for item in allow_dict['button']]
+        ):
+            return True
+        
+        # 如果接口权限不为空，判定是否有接口权限
+        if self.interface_list and self.check_items_permission(
+            PermissionEnum.get_codes(self.interface_list), 
+            [getattr(item, 'code') for item in allow_dict['interface']]
+        ):
+            return True
+        
+        # 如果按钮和接口都没有，那么判定是否有菜单权限
+        if (len(self.buttion_list) == len(self.interface_list) == 0) and self.menu_list\
+            and self.check_items_permission(
+            PermissionEnum.get_codes(self.menu_list), 
+            [getattr(item, 'code') for item in allow_dict['menu']]
+        ):
+            return True
 
+        return False
 
 
 def generate_token(data: dict, secret_key: str, expire_minutes: int, algorithm: str) -> str:

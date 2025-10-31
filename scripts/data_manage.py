@@ -78,4 +78,5 @@ async def create_superadmin(*args, **kwargs):
     
     data = {'name': name, 'password': pwd, 'rid': getattr(role, 'id')}
     super_admin_user_data = UserCreateSchema(**data)
-    await UserServer.create_user(super_admin_user_data, session)
+    user = await UserServer.create_user(super_admin_user_data, session)
+    await UserServer.user_dispatch_role(getattr(user, 'id'), getattr(role, 'id'), session)

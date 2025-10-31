@@ -2,6 +2,7 @@ from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
 from db import DBBaseModel
+from models.permission import PermissionModel
 from models.role_permission import RolePermissionModel
 
 
@@ -20,3 +21,12 @@ class RoleModel(DBBaseModel):
         secondary=RolePermissionModel.__table__,
         back_populates='roles', lazy='selectin'
     )
+
+    def get_permission_codes(self, key: str | None) -> list[str]:
+        permissions: list[PermissionModel] = self.permissions
+        if key is None:
+            return [getattr(p, 'code') for p in permissions]
+        permission_dict = PermissionModel.group_permission(permissions)
+        if key in permission_dict:
+            return [getattr(p, 'code') for p in permission_dict[key]]
+        return []

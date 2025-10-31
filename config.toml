@@ -15,7 +15,7 @@ file = 'log.txt'
 # MySQL: "mysql+aiomysql://user:password@localhost:3306/dbname"
 # SQLite: "sqlite+aiosqlite:///./test.db"（注意：SQLite 异步需用 aiosqlite）
 url = 'sqlite+aiosqlite:///./test.db'
-echo = true
+echo = false
 
 [auth]
 [auth.jwt]

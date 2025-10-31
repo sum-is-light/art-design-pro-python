@@ -37,7 +37,7 @@ async def update(id: int, data: RoleUpdateSchema, session: AsyncSession = Depend
 
 @router.put('/dispatch-permission/{id}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.ROLE_MANAGE],
-        buttion_list=[ButtionEnum.ROLE_EDIT]
+        buttion_list=[ButtionEnum.ROLE_DISPATCH_PERMISSION]
 ).to_openapi_extra())
 async def update_permission(id: int, data: RoleUpdatePermissionSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'id: {id}, data: {data.model_dump()}')
@@ -91,7 +91,7 @@ async def pagelist(data: PaginationQuerySchema = Depends(get_query_params), sess
 
 @router.get('/{id}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.ROLE_MANAGE],
-        buttion_list=[ButtionEnum.ROLE_EDIT]
+        interface_list=[InterfaceEnum.ROLE_GET]
 ).to_openapi_extra())
 async def get_by_id(id: int, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'id: {id}')

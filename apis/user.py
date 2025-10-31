@@ -10,6 +10,9 @@ from common.auth import RoutePermission, generate_token
 from common.depends import get_query_params, check_permission
 from common.permission_enum import MenuEnum, InterfaceEnum, ButtionEnum
 
+from models.role import RoleModel
+from models.user import UserModel
+
 from schemas.role import RoleSchema
 from schemas.user import (
     UserCreateSchema, UserSchema, UserLoginSchema, UserUpdateSchema,
@@ -33,8 +36,7 @@ async def change_status(uid: int, data: UserChangeStatusSchema, session: AsyncSe
 
 @router.post('/dispatch/{uid}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.USER_MANAGE],
-        interface_list=[InterfaceEnum.USER_ENABLE],
-        buttion_list=[ButtionEnum.USER_EDIT]
+        buttion_list=[ButtionEnum.USER_DISPATCH_ROLE]
 ).to_openapi_extra())
 async def user_dispatch_role(uid: int, data: UserDispatchRoleSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'userId: {uid}, data: {data.model_dump()}')
@@ -86,9 +88,11 @@ async def login(data: UserLoginSchema, session: AsyncSession = Depends(async_ses
 async def info(user: UserService.UserModel = Depends(check_permission), session: AsyncSession = Depends(async_session)):
     ''' 获取用户信息接口 '''
     user_dict = UserSchema.model_validate(user).model_dump()
-    user_dict['roles'] = ['R_SUPER']
-    user_dict['role'] = RoleSchema.model_validate(user.role).model_dump()
-    user_dict['rid'] = user.role.id
+    role: RoleModel = user.role
+    if role != None:
+        # 这里的roles其实是角色菜单权限列表
+        user_dict['roles'] = role.get_permission_codes('menu')
+        user_dict['buttons'] = role.get_permission_codes('button')
     return CommonResponse.success(data=user_dict)
 
 

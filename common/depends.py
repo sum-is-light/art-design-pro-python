@@ -7,9 +7,10 @@ from db import AsyncSession, async_session
 
 from common.utils import get_model_fields
 from common.auth import RoutePermission, parse_token
-from common.exception import PermissionException
 from common.pagination import PaginationQuerySchema
+from common.exception import PermissionException, ApiException
 
+from models.role import RoleModel
 from services import user as UserService
 
 
@@ -50,6 +51,10 @@ async def check_permission(request: Request, Authorization: Annotated[str, Heade
     if not user_obj:
         raise PermissionException('用户不存在')
     
-    # if not route_permission.check_menu('user-manage'):
-    #     raise PermissionException('灭有权限')
+    if not user_obj.role:
+        raise PermissionException('未知角色，没有权限访问')
+    role: RoleModel = user_obj.role
+    # 基于路由权限需要基于角色判定是否有权限访问
+    if not route_permission.check_permission(role):
+        raise ApiException('没有权限')
     return user_obj
