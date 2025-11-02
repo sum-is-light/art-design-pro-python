@@ -1,5 +1,10 @@
+import os
 import toml
 from pydantic import BaseModel, Field
+
+
+class SourceConfig(BaseModel):
+    avatar_source: str = Field(description='头像资源名称')
 
 
 class EnvConfig(BaseModel):
@@ -8,6 +13,9 @@ class EnvConfig(BaseModel):
     port: int = Field(description='端口号')
     workers: int = Field(description='线程数')
     debug: bool = Field(description='是否开启调试模式')
+    source_dir: str = Field(description='静态资源地址')
+    source_prefix: str = Field(description='静态资源前缀')
+    source: SourceConfig = Field(description='具体的资源配置')
 
 
 class LogConfig(BaseModel):
@@ -59,3 +67,9 @@ ENV_CONFIG = CONFIG.env
 LOG_CONFIG = CONFIG.log
 DB_CONFIG = CONFIG.db
 AUTH_CONFIG = CONFIG.auth
+SOURCE_CONFIG = ENV_CONFIG.source
+
+# 初始化资源
+os.makedirs(ENV_CONFIG.source_dir, exist_ok=True)
+# 创建具体资源
+os.makedirs(os.path.join(ENV_CONFIG.source_dir, SOURCE_CONFIG.avatar_source), exist_ok=True)

@@ -25,6 +25,10 @@ class UserChangeStatusSchema(BaseModel):
     enable: bool = Field(description='是否启用')
 
 
+class UserChangePasswordSchema(BaseModel):
+    password: str = Field(description='新密码')
+
+
 class UserDispatchRoleSchema(BaseModel):
     rid: int = Field(description='角色ID')
 

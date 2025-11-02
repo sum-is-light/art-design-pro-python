@@ -1,9 +1,12 @@
+import os
+from uuid import uuid4
+from fastapi import APIRouter, Depends, File, UploadFile
+
 import services.user as UserService
-from fastapi import APIRouter, Depends
+from db import AsyncSession, async_session
+from config import AUTH_CONFIG, ENV_CONFIG, SOURCE_CONFIG
 
 from common.log import logger
-from config import AUTH_CONFIG
-from db import AsyncSession, async_session
 from common.response import CommonResponse
 from common.pagination import PaginationQuerySchema
 from common.auth import RoutePermission, generate_token
@@ -16,7 +19,7 @@ from models.user import UserModel
 from schemas.role import RoleSchema
 from schemas.user import (
     UserCreateSchema, UserSchema, UserLoginSchema, UserUpdateSchema,
-    UserChangeStatusSchema, UserDispatchRoleSchema
+    UserChangeStatusSchema, UserDispatchRoleSchema, UserChangePasswordSchema
 )
 
 
@@ -32,6 +35,49 @@ async def change_status(uid: int, data: UserChangeStatusSchema, session: AsyncSe
     logger.info(f'userId: {uid}, status: {data.enable}')
     await UserService.change_status(uid, data.enable, session)
     return CommonResponse.success(data=True)
+
+
+@router.post('/update', openapi_extra=RoutePermission(
+        interface_list=[InterfaceEnum.USER_SELF_EDIT]
+).to_openapi_extra())
+async def update_self(data: UserUpdateSchema, user: UserService.UserModel = Depends(check_permission), session: AsyncSession = Depends(async_session)):
+    ''' 更新用户自己的信息接口 '''
+    user = await UserService.update_by_id(getattr(user, 'id'), data, session)
+    user_dict = UserSchema.model_validate(user).model_dump()
+    return CommonResponse.success(data=user_dict)
+
+
+@router.post('/upload-avatar', openapi_extra=RoutePermission(
+        interface_list=[InterfaceEnum.USER_SELF_EDIT]
+).to_openapi_extra())
+async def upload_avatar(avatar_file: UploadFile = File()):
+    ''' 上传用户头像数据 '''
+    # 获取需要保存的文件路径
+    save_dir = os.path.join(ENV_CONFIG.source_dir, SOURCE_CONFIG.avatar_source)
+    file_name = f'{uuid4()}.jpg'
+    save_path = os.path.join(save_dir, file_name)
+    
+    # 分批次保存文件，避免大文件占用内存过高
+    chunk_size = 1024 * 1024    # 每次读取 1MB
+    with open(save_path, 'ab') as fp:
+        while True:
+            chunk = await avatar_file.read(chunk_size) 
+            if not chunk:
+                break
+            fp.write(chunk)
+    # 返回不带http前缀的url地址
+    url = '/'.join([ENV_CONFIG.source_prefix, SOURCE_CONFIG.avatar_source, file_name])
+    return CommonResponse.success(data={ 'url': url })
+
+
+@router.post('/change-pwd', openapi_extra=RoutePermission(
+        interface_list=[InterfaceEnum.USER_SELF_EDIT]
+).to_openapi_extra())
+async def update_self_pwd(data: UserChangePasswordSchema, user: UserService.UserModel = Depends(check_permission), session: AsyncSession = Depends(async_session)):
+    ''' 更新用户自己的密码接口 '''
+    user = await UserService.update_pwd_by_id(getattr(user, 'id'), data, session)
+    user_dict = UserSchema.model_validate(user).model_dump()
+    return CommonResponse.success(data=user_dict)
 
 
 @router.post('/dispatch/{uid}', openapi_extra=RoutePermission(
@@ -83,7 +129,7 @@ async def login(data: UserLoginSchema, session: AsyncSession = Depends(async_ses
 
 
 @router.get('/info', openapi_extra=RoutePermission(
-        interface_list=[InterfaceEnum.USER_GET]
+        interface_list=[InterfaceEnum.USER_SELF_GET]
 ).to_openapi_extra())
 async def info(user: UserService.UserModel = Depends(check_permission), session: AsyncSession = Depends(async_session)):
     ''' 获取用户信息接口 '''

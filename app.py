@@ -1,8 +1,10 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
+from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 
 from apis import router_list
+from config import ENV_CONFIG
 from db import async_engine, DBBaseModel
 from common.log import logger
 from common.depends import check_permission
@@ -38,4 +40,7 @@ def create_app() -> FastAPI:
     # 添加自定义中间件
     app.middleware('http')(handle_exception_middleware)
     app.exception_handler(RequestValidationError)(handler_validation_exception)
+
+    # 挂载文件服务
+    app.mount(ENV_CONFIG.source_prefix, StaticFiles(directory=ENV_CONFIG.source_dir), name='source')
     return app

@@ -43,6 +43,8 @@ class MenuEnum(PermissionEnum):
 class InterfaceEnum(PermissionEnum):
     ''' 接口权限枚举 '''
     USER_GET = PermissionEnumValue(name='获取用户信息', code='/users/get')
+    USER_SELF_GET = PermissionEnumValue(name='获取自己的信息', code='/users/self-get')
+    USER_SELF_EDIT = PermissionEnumValue(name='编辑自己的信息', code='/users/self-edit')
     USER_LIST = PermissionEnumValue(name='查询用户列表', code='/users/list')
     USER_POST = PermissionEnumValue(name='创建用户', code='/users/post')
     USER_PUT = PermissionEnumValue(name='修改用户信息', code='/users/put')

@@ -12,7 +12,7 @@ from common.utils import get_db_model_fields
 from common.pagination import PaginationQuerySchema, PaginationSchema, pagination
 
 import services.role as RoleService
-from schemas.user import UserCreateSchema, UserUpdateSchema
+from schemas.user import UserCreateSchema, UserUpdateSchema, UserChangePasswordSchema
 
 
 async def delete_by_id(id: int, session: AsyncSession):
@@ -50,6 +50,17 @@ async def update_by_id(id: int, data: UserUpdateSchema, session: AsyncSession) -
         if v is None:
             continue
         setattr(obj, k, v)
+    await session.commit()
+    await session.refresh(obj)
+    return obj
+
+
+async def update_pwd_by_id(id: int, data: UserChangePasswordSchema, session: AsyncSession) -> UserModel:
+    obj = await get_obj_by_query({'id': id}, session)
+    if not obj:
+        raise ApiException('用户不存在')
+    
+    obj.password = data.password
     await session.commit()
     await session.refresh(obj)
     return obj
