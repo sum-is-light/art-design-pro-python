@@ -10,7 +10,7 @@ from common.response import CommonResponse
 from common.exception import ApiException
 from common.depends import get_query_params
 from common.pagination import PaginationQuerySchema
-from common.permission_enum import MenuEnum, InterfaceEnum, ButtionEnum
+from common.permission_enum import MenuEnum, InterfaceEnum, ButtonEnum
 
 from models.user import UserModel
 from models.permission import PermissionEnum
@@ -22,7 +22,7 @@ router = APIRouter()
 
 @router.put('/{id}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.ROLE_MANAGE],
-        buttion_list=[ButtionEnum.ROLE_EDIT]
+        buttion_list=[ButtonEnum.ROLE_EDIT]
 ).to_openapi_extra())
 async def update(id: int, data: RoleUpdateSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'id: {id}, data: {data.model_dump()}')
@@ -37,7 +37,7 @@ async def update(id: int, data: RoleUpdateSchema, session: AsyncSession = Depend
 
 @router.put('/dispatch-permission/{id}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.ROLE_MANAGE],
-        buttion_list=[ButtionEnum.ROLE_DISPATCH_PERMISSION]
+        buttion_list=[ButtonEnum.ROLE_DISPATCH_PERMISSION]
 ).to_openapi_extra())
 async def update_permission(id: int, data: RoleUpdatePermissionSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'id: {id}, data: {data.model_dump()}')
@@ -52,7 +52,7 @@ async def update_permission(id: int, data: RoleUpdatePermissionSchema, session: 
 
 @router.delete('/{id}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.ROLE_MANAGE],
-        buttion_list=[ButtionEnum.ROLE_DEL]
+        buttion_list=[ButtonEnum.ROLE_DEL]
 ).to_openapi_extra())
 async def delete(id: int, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'id: {id}')
@@ -62,7 +62,7 @@ async def delete(id: int, session: AsyncSession = Depends(async_session)) -> Com
 
 @router.post('/', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.ROLE_MANAGE],
-        buttion_list=[ButtionEnum.ROLE_ADD]
+        buttion_list=[ButtonEnum.ROLE_ADD]
 ).to_openapi_extra())
 async def post(data: RoleCreateSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'data: {data.model_dump()}')

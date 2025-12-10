@@ -11,7 +11,7 @@ from common.response import CommonResponse
 from common.pagination import PaginationQuerySchema
 from common.auth import RoutePermission, generate_token
 from common.depends import get_query_params, check_permission
-from common.permission_enum import MenuEnum, InterfaceEnum, ButtionEnum
+from common.permission_enum import MenuEnum, InterfaceEnum, ButtonEnum
 
 from models.role import RoleModel
 from models.user import UserModel
@@ -29,7 +29,7 @@ router = APIRouter()
 @router.put('/change_status/{uid}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.USER_MANAGE],
         interface_list=[InterfaceEnum.USER_ENABLE],
-        buttion_list=[ButtionEnum.USER_EDIT]
+        buttion_list=[ButtonEnum.USER_EDIT]
 ).to_openapi_extra())
 async def change_status(uid: int, data: UserChangeStatusSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'userId: {uid}, status: {data.enable}')
@@ -82,7 +82,7 @@ async def update_self_pwd(data: UserChangePasswordSchema, user: UserService.User
 
 @router.post('/dispatch/{uid}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.USER_MANAGE],
-        buttion_list=[ButtionEnum.USER_DISPATCH_ROLE]
+        buttion_list=[ButtonEnum.USER_DISPATCH_ROLE]
 ).to_openapi_extra())
 async def user_dispatch_role(uid: int, data: UserDispatchRoleSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'userId: {uid}, data: {data.model_dump()}')
@@ -93,7 +93,7 @@ async def user_dispatch_role(uid: int, data: UserDispatchRoleSchema, session: As
 @router.put('/{uid}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.USER_MANAGE],
         interface_list=[InterfaceEnum.USER_PUT],
-        buttion_list=[ButtionEnum.USER_EDIT]
+        buttion_list=[ButtonEnum.USER_EDIT]
 ).to_openapi_extra())
 async def update(uid: int, data: UserUpdateSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'userId: {uid}, data: {data.model_dump()}')
@@ -104,7 +104,7 @@ async def update(uid: int, data: UserUpdateSchema, session: AsyncSession = Depen
 @router.delete('/{uid}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.USER_MANAGE],
         interface_list=[InterfaceEnum.USER_DEL],
-        buttion_list=[ButtionEnum.USER_DEL]
+        buttion_list=[ButtonEnum.USER_DEL]
 ).to_openapi_extra())
 async def delete(uid: int, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'userId: {uid}')
@@ -167,7 +167,7 @@ async def get_info_by_id(uid: int, session: AsyncSession = Depends(async_session
 @router.post('/', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.USER_MANAGE],
         interface_list=[InterfaceEnum.USER_POST],
-        buttion_list=[ButtionEnum.USER_ADD]
+        buttion_list=[ButtonEnum.USER_ADD]
 ).to_openapi_extra())
 async def post(data: UserCreateSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'data: {data.model_dump()}')

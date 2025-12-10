@@ -54,7 +54,7 @@ class InterfaceEnum(PermissionEnum):
     ROLE_GET = PermissionEnumValue(name='获取角色信息', code='/roles/get')
 
 
-class ButtionEnum(PermissionEnum):
+class ButtonEnum(PermissionEnum):
     ''' 按钮权限枚举 '''
     USER_ADD = PermissionEnumValue(name='用户新增', code='user:add')
     USER_EDIT = PermissionEnumValue(name='用户编辑', code='user:edit')

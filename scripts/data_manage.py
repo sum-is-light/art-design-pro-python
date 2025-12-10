@@ -11,7 +11,7 @@ from schemas.user import UserCreateSchema
 from schemas.permission import PermissionCreateSchema
 
 from common.log import logger
-from common.permission_enum import PermissionEnum as PermissionDetailEnum, MenuEnum, InterfaceEnum, ButtionEnum
+from common.permission_enum import PermissionEnum as PermissionDetailEnum, MenuEnum, InterfaceEnum, ButtonEnum
 
 
 ########################### 初始化权限相关内容 ###########################
@@ -30,7 +30,7 @@ async def insert_permission(*args, **kwargs):
     session: AsyncSession = kwargs['session']
     await insert_by_enum(MenuEnum, PermissionEnum.MENU, session)
     await insert_by_enum(InterfaceEnum, PermissionEnum.INTERFACE, session)
-    await insert_by_enum(ButtionEnum, PermissionEnum.BUTTON, session)
+    await insert_by_enum(ButtonEnum, PermissionEnum.BUTTON, session)
 
 
 ########################### 初始化角色相关内容 ###########################

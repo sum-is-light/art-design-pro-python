@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 
 from common.log import logger
 from common.exception import PermissionException
-from common.permission_enum import MenuEnum, InterfaceEnum, ButtionEnum, PermissionEnum
+from common.permission_enum import MenuEnum, InterfaceEnum, ButtonEnum, PermissionEnum
 
 from models.role import RoleModel
 from models.permission import PermissionModel
@@ -14,7 +14,7 @@ class RoutePermission(BaseModel):
     ''' 路由权限类 '''
     menu_list: list[MenuEnum] = Field(default_factory=list, description='路由对应的菜单权限列表')
     interface_list: list[InterfaceEnum] = Field(default_factory=list, description='路由对应的接口权限列表')
-    buttion_list: list[ButtionEnum] = Field(default_factory=list, description='路由对应的按钮权限列表')
+    buttion_list: list[ButtonEnum] = Field(default_factory=list, description='路由对应的按钮权限列表')
 
     def to_openapi_extra(self) -> dict:
         return {self.get_extra_key(): self.model_dump()}

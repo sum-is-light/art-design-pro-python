@@ -8,7 +8,7 @@ from common.auth import RoutePermission
 from common.response import CommonResponse
 from common.depends import get_query_params
 from common.pagination import PaginationQuerySchema
-from common.permission_enum import MenuEnum, InterfaceEnum, ButtionEnum
+from common.permission_enum import MenuEnum, InterfaceEnum, ButtonEnum
 
 from models.enums import PermissionEnum
 from schemas.permission import PermissionSchema, PermissionCreateSchema, PermissionUpdateSchema
@@ -18,7 +18,7 @@ router = APIRouter()
 
 @router.put('/{id}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.PERMISSION_MANAGE],
-        buttion_list=[ButtionEnum.PERMISSION_EDIT]
+        buttion_list=[ButtonEnum.PERMISSION_EDIT]
 ).to_openapi_extra())
 async def update(id: int, data: PermissionUpdateSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'id: {id}, data: {data.model_dump()}')
@@ -28,7 +28,7 @@ async def update(id: int, data: PermissionUpdateSchema, session: AsyncSession = 
 
 @router.delete('/{id}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.PERMISSION_MANAGE],
-        buttion_list=[ButtionEnum.PERMISSION_DEL]
+        buttion_list=[ButtonEnum.PERMISSION_DEL]
 ).to_openapi_extra())
 async def delete(id: int, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'id: {id}')
@@ -38,7 +38,7 @@ async def delete(id: int, session: AsyncSession = Depends(async_session)) -> Com
 
 @router.post('/', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.PERMISSION_MANAGE],
-        buttion_list=[ButtionEnum.PERMISSION_ADD]
+        buttion_list=[ButtonEnum.PERMISSION_ADD]
 ).to_openapi_extra())
 async def post(data: PermissionCreateSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'data: {data.model_dump()}')
