@@ -22,7 +22,7 @@ router = APIRouter()
 
 @router.put('/{id}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.ROLE_MANAGE],
-        buttion_list=[ButtonEnum.ROLE_EDIT]
+        button_list=[ButtonEnum.ROLE_EDIT]
 ).to_openapi_extra())
 async def update(id: int, data: RoleUpdateSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'id: {id}, data: {data.model_dump()}')
@@ -37,7 +37,7 @@ async def update(id: int, data: RoleUpdateSchema, session: AsyncSession = Depend
 
 @router.put('/dispatch-permission/{id}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.ROLE_MANAGE],
-        buttion_list=[ButtonEnum.ROLE_DISPATCH_PERMISSION]
+        button_list=[ButtonEnum.ROLE_DISPATCH_PERMISSION]
 ).to_openapi_extra())
 async def update_permission(id: int, data: RoleUpdatePermissionSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'id: {id}, data: {data.model_dump()}')
@@ -52,7 +52,7 @@ async def update_permission(id: int, data: RoleUpdatePermissionSchema, session: 
 
 @router.delete('/{id}', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.ROLE_MANAGE],
-        buttion_list=[ButtonEnum.ROLE_DEL]
+        button_list=[ButtonEnum.ROLE_DEL]
 ).to_openapi_extra())
 async def delete(id: int, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'id: {id}')
@@ -62,7 +62,7 @@ async def delete(id: int, session: AsyncSession = Depends(async_session)) -> Com
 
 @router.post('/', openapi_extra=RoutePermission(
         menu_list=[MenuEnum.ROLE_MANAGE],
-        buttion_list=[ButtonEnum.ROLE_ADD]
+        button_list=[ButtonEnum.ROLE_ADD]
 ).to_openapi_extra())
 async def post(data: RoleCreateSchema, session: AsyncSession = Depends(async_session)) -> CommonResponse:
     logger.info(f'data: {data.model_dump()}')

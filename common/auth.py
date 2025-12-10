@@ -14,7 +14,7 @@ class RoutePermission(BaseModel):
     ''' 路由权限类 '''
     menu_list: list[MenuEnum] = Field(default_factory=list, description='路由对应的菜单权限列表')
     interface_list: list[InterfaceEnum] = Field(default_factory=list, description='路由对应的接口权限列表')
-    buttion_list: list[ButtonEnum] = Field(default_factory=list, description='路由对应的按钮权限列表')
+    button_list: list[ButtonEnum] = Field(default_factory=list, description='路由对应的按钮权限列表')
 
     def to_openapi_extra(self) -> dict:
         return {self.get_extra_key(): self.model_dump()}
@@ -25,7 +25,7 @@ class RoutePermission(BaseModel):
     
     def is_require_auth(self) -> bool:
         ''' 是否需要权限验证，如果三种权限都为空那么就不需要权限认证 '''
-        return any([len(self.menu_list), len(self.interface_list), len(self.buttion_list)])
+        return any([len(self.menu_list), len(self.interface_list), len(self.button_list)])
     
     @classmethod
     def check_items_permission(cls, require_codes: list[str], allow_codes: list[str]) -> bool:
@@ -53,13 +53,13 @@ class RoutePermission(BaseModel):
         ''' 权限校验逻辑 '''
         # 分别判定route定义的要求在角色的权限中是否存在
         allow_dict = PermissionModel.group_permission(role.permissions)
-        require_dict = {'menu': self.menu_list, 'interface': self.interface_list, 'button': self.buttion_list}
+        require_dict = {'menu': self.menu_list, 'interface': self.interface_list, 'button': self.button_list}
         # 如果路由三个权限都不需要，直接通过
         if all([len(permission_list) == 0 for permission_list in require_dict.values()]):
             return True
         # 如果按钮权限不为空，判定有没有按钮权限
-        if self.buttion_list and self.check_items_permission(
-            PermissionEnum.get_codes(self.buttion_list), 
+        if self.button_list and self.check_items_permission(
+            PermissionEnum.get_codes(self.button_list), 
             [getattr(item, 'code') for item in allow_dict['button']]
         ):
             return True
@@ -72,7 +72,7 @@ class RoutePermission(BaseModel):
             return True
         
         # 如果按钮和接口都没有，那么判定是否有菜单权限
-        if (len(self.buttion_list) == len(self.interface_list) == 0) and self.menu_list\
+        if (len(self.button_list) == len(self.interface_list) == 0) and self.menu_list\
             and self.check_items_permission(
             PermissionEnum.get_codes(self.menu_list), 
             [getattr(item, 'code') for item in allow_dict['menu']]
